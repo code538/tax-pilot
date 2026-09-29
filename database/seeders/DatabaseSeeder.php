@@ -12,9 +12,9 @@ class DatabaseSeeder extends Seeder
          * Global permissions
          */
         $this->call([
-            //PermissionSeeder::class,
+            PermissionSeeder::class,
             FilingTypeSeeder::class,
-           // SuperAdminSeeder::class,
+            SuperAdminSeeder::class,
         ]);
 
         /*
