@@ -150,35 +150,35 @@ class PermissionSeeder extends Seeder
                 'slug' => 'filing.view',
                 'module' => 'filing',
                 'action' => 'view',
-                'description' => 'View tax filings.',
+                'description' => 'View organisation filings',
+                'is_active' => true,
             ],
+
             [
                 'name' => 'Create Filing',
                 'slug' => 'filing.create',
                 'module' => 'filing',
                 'action' => 'create',
-                'description' => 'Create tax filings.',
+                'description' => 'Create organisation filings',
+                'is_active' => true,
             ],
+
             [
                 'name' => 'Update Filing',
                 'slug' => 'filing.update',
                 'module' => 'filing',
                 'action' => 'update',
-                'description' => 'Update tax filings.',
+                'description' => 'Update organisation filings',
+                'is_active' => true,
             ],
+
             [
                 'name' => 'Delete Filing',
                 'slug' => 'filing.delete',
                 'module' => 'filing',
                 'action' => 'delete',
-                'description' => 'Delete tax filings.',
-            ],
-            [
-                'name' => 'Submit Filing',
-                'slug' => 'filing.submit',
-                'module' => 'filing',
-                'action' => 'submit',
-                'description' => 'Submit tax filings to the appropriate authority.',
+                'description' => 'Delete draft filings',
+                'is_active' => true,
             ],
 
             /*
@@ -291,6 +291,40 @@ class PermissionSeeder extends Seeder
                 'module' => 'filing_subject',
                 'action' => 'delete',
                 'description' => 'Delete filing subjects.',
+                'is_active' => true,
+            ],
+
+            // form definitions
+            [
+                'name' => 'Form Definition View',
+                'slug' => 'form_definition.view',
+                'module' => 'form_definition',
+                'action' => 'view',
+                'description' => 'View form definitions.',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Form Definition Create',
+                'slug' => 'form_definition.create',
+                'module' => 'form_definition',
+                'action' => 'create',
+                'description' => 'Create form definitions.',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Form Definition Update',
+                'slug' => 'form_definition.update',
+                'module' => 'form_definition',
+                'action' => 'update',
+                'description' => 'Update form definitions.',
+                'is_active' => true,
+            ],
+            [
+                'name' => 'Form Definition Deactivate',
+                'slug' => 'form_definition.deactivate',
+                'module' => 'form_definition',
+                'action' => 'deactivate',
+                'description' => 'Deactivate form definitions.',
                 'is_active' => true,
             ],
         ];

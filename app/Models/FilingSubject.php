@@ -47,4 +47,9 @@ class FilingSubject extends Model
             Organisation::class
         );
     }
+
+    public function filings()
+    {
+        return $this->hasMany(Filing::class);
+    }
 }

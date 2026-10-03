@@ -10,7 +10,11 @@ use App\Http\Controllers\Api\V1\Organisation\PermissionController;
 use App\Http\Controllers\Api\V1\Organisation\OrganisationInvitationController;
 use App\Http\Controllers\Api\V1\Auth\InvitationController;
 use App\Http\Controllers\Api\V1\FilingSubject\FilingSubjectController;
-
+use App\Http\Controllers\Api\V1\Filing\FilingController;
+use App\Http\Controllers\Api\V1\Filing\FilingVersionController;
+use App\Http\Controllers\Api\V1\FormDefinitionController;
+use App\Http\Controllers\Api\V1\FormVersionController;
+use App\Http\Controllers\Api\V1\FormSectionController;
 
 
 Route::prefix('v1')->group(function () {
@@ -154,6 +158,9 @@ Route::prefix('v1')->group(function () {
             'organisations/{organisationId}',
             [SuperAdminController::class, 'deleteOrganisation']
         );
+
+        
+
     });
 
     Route::middleware('auth:sanctum')->group(function () {
@@ -247,6 +254,168 @@ Route::prefix('v1')->group(function () {
                 [FilingSubjectController::class, 'destroy']
             )->middleware('permission:filing_subject.delete');
     });
+
+    Route::middleware([
+        'auth:sanctum',
+        'organisation',
+    ])->prefix(
+        'organisations/{organisationId}/filings'
+    )->group(function () {
+
+        Route::get(
+            '/',
+            [FilingController::class, 'index']
+        )->middleware('permission:filing.view');
+
+        Route::post(
+            '/',
+            [FilingController::class, 'store']
+        )->middleware('permission:filing.create');
+
+        Route::get(
+            '/{filingId}',
+            [FilingController::class, 'show']
+        )->middleware('permission:filing.view');
+
+        Route::put(
+            '/{filingId}',
+            [FilingController::class, 'update']
+        )->middleware('permission:filing.update');
+
+        Route::delete(
+            '/{filingId}',
+            [FilingController::class, 'destroy']
+        )->middleware('permission:filing.delete');
+    });
+
+    Route::middleware([
+        'auth:sanctum',
+        'organisation',
+    ])
+        ->prefix('organisations/{organisationId}')
+        ->group(function () {
+
+            Route::prefix('filings/{filingId}/versions')
+                ->group(function () {
+
+                    Route::get(
+                        '/',
+                        [FilingVersionController::class, 'index']
+                    );
+
+                    Route::post(
+                        '/',
+                        [FilingVersionController::class, 'store']
+                    );
+
+                    Route::get(
+                        '/{versionId}',
+                        [FilingVersionController::class, 'show']
+                    );
+                });
+        });
+
+    
+    Route::middleware('auth:sanctum')
+        ->group(function () {
+            Route::prefix('form-definitions')
+                ->name('form-definitions.')
+                ->group(function () {
+                    Route::get(
+                        '/',
+                        [FormDefinitionController::class, 'index']
+                    )->name('index');
+
+                    Route::post(
+                        '/',
+                        [FormDefinitionController::class, 'store']
+                    )->name('store');
+
+                    Route::get(
+                        '/{formDefinitionId}',
+                        [FormDefinitionController::class, 'show']
+                    )->whereNumber('formDefinitionId')
+                    ->name('show');
+
+                    Route::put(
+                        '/{formDefinitionId}',
+                        [FormDefinitionController::class, 'update']
+                    )->whereNumber('formDefinitionId')
+                    ->name('update');
+
+                    Route::delete(
+                        '/{formDefinitionId}',
+                        [FormDefinitionController::class, 'destroy']
+                    )->whereNumber('formDefinitionId')
+                    ->name('destroy');
+                });
+        });
+
+    Route::middleware(['auth:sanctum'])->prefix('form-versions')->group(function () {
+
+        Route::get(
+            '/',
+            [FormVersionController::class, 'index']
+        );
+
+        Route::post(
+            '/',
+            [FormVersionController::class, 'store']
+        );
+
+        Route::get(
+            '/{formVersionId}',
+            [FormVersionController::class, 'show']
+        )->whereNumber('formVersionId');
+
+        Route::post(
+            '/{formVersionId}/publish',
+            [FormVersionController::class, 'publish']
+        )->whereNumber('formVersionId');
+
+        Route::delete(
+            '/versions/{formVersionId}',
+            [FormVersionController::class, 'destroy']
+        )->whereNumber('formVersionId');
+
+        //form sections routes
+        Route::get(
+        '/{formVersionId}/sections',
+            [FormSectionController::class, 'index']
+        )->whereNumber('formVersionId');
+
+        Route::post(
+            '/{formVersionId}/sections',
+            [FormSectionController::class, 'store']
+        )->whereNumber('formVersionId');
+
+        Route::get(
+            '/{formVersionId}/sections/{formSectionId}',
+            [FormSectionController::class, 'show']
+        )->whereNumber('formVersionId')
+         ->whereNumber('formSectionId');
+
+        Route::put(
+            '/{formVersionId}/sections/{formSectionId}',
+            [FormSectionController::class, 'update']
+        )->whereNumber('formVersionId')
+         ->whereNumber('formSectionId');
+
+        // Route::patch(
+        //     '/{formVersionId}/sections/{formSectionId}',
+        //     [FormSectionController::class, 'update']
+        // )->whereNumber('formVersionId')
+        //  ->whereNumber('formSectionId');
+
+        Route::delete(
+            '/{formVersionId}/sections/{formSectionId}',
+            [FormSectionController::class, 'destroy']
+        )->whereNumber('formVersionId')
+         ->whereNumber('formSectionId');
+
+    });  
+    
+  
 
     Route::post('invitations/{token}/accept',
         [InvitationController::class, 'accept']

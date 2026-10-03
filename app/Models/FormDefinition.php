@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class FilingType extends Model
+class FormDefinition extends Model
 {
+     use HasFactory;
+
     protected $fillable = [
+        'filing_type_id',
         'name',
         'slug',
-        'category',
-        'authority',
         'description',
         'is_active',
         'sort_order',
@@ -25,8 +28,15 @@ class FilingType extends Model
         ];
     }
 
-    public function filings(): HasMany
+    public function filingType(): BelongsTo
     {
-        return $this->hasMany(Filing::class);
+        return $this->belongsTo(FilingType::class);
+    }
+
+    
+
+    public function versions(): HasMany
+    {
+        return $this->hasMany(FormVersion::class);
     }
 }

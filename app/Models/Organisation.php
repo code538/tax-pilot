@@ -78,4 +78,9 @@ class Organisation extends Model
             FilingSubject::class
         );
     }
+
+    public function filings()
+    {
+        return $this->hasMany(Filing::class);
+    }
 }
