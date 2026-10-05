@@ -13,6 +13,7 @@ class FilingVersion extends Model
     protected $fillable = [
         'filing_id',
         'organisation_id',
+        'form_version_id',
         'version_number',
         'supersedes_version_id',
         'revision_reason',
@@ -52,5 +53,10 @@ class FilingVersion extends Model
     public function preparedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'prepared_by');
+    }
+    
+    public function formVersion(): BelongsTo
+    {
+        return $this->belongsTo(FormVersion::class);
     }
 }

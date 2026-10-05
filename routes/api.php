@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\Filing\FilingVersionController;
 use App\Http\Controllers\Api\V1\FormDefinitionController;
 use App\Http\Controllers\Api\V1\FormVersionController;
 use App\Http\Controllers\Api\V1\FormSectionController;
+use App\Http\Controllers\Api\V1\FormFieldController;
 
 
 Route::prefix('v1')->group(function () {
@@ -158,6 +159,41 @@ Route::prefix('v1')->group(function () {
             'organisations/{organisationId}',
             [SuperAdminController::class, 'deleteOrganisation']
         );
+
+        //dynamic form field add
+        Route::get(
+            'form-versions/{formVersionId}/sections/{formSectionId}/fields',
+            [FormFieldController::class, 'index']
+        )->whereNumber('formVersionId')
+         ->whereNumber('formSectionId');
+
+        Route::post(
+            'form-versions/{formVersionId}/sections/{formSectionId}/fields',
+            [FormFieldController::class, 'store']
+        )->whereNumber('formVersionId')
+         ->whereNumber('formSectionId');
+
+        Route::get(
+            'form-versions/{formVersionId}/sections/{formSectionId}/fields/{formFieldId}',
+            [FormFieldController::class, 'show']
+        )->whereNumber('formVersionId')
+         ->whereNumber('formSectionId')
+         ->whereNumber('formFieldId');
+
+        Route::match(
+            ['put', 'patch'],
+            'form-versions/{formVersionId}/sections/{formSectionId}/fields/{formFieldId}',
+            [FormFieldController::class, 'update']
+        )->whereNumber('formVersionId')
+         ->whereNumber('formSectionId')
+         ->whereNumber('formFieldId');
+
+        Route::delete(
+            'form-versions/{formVersionId}/sections/{formSectionId}/fields/{formFieldId}',
+            [FormFieldController::class, 'destroy']
+        )->whereNumber('formVersionId')
+         ->whereNumber('formSectionId')
+         ->whereNumber('formFieldId');
 
         
 
