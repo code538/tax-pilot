@@ -4,94 +4,126 @@ namespace App\Services;
 
 use App\Models\Filing;
 use App\Models\FilingVersion;
-use App\Models\Organisation;
+use App\Models\FormVersion;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class FilingVersionService
 {
-    public function all(
-        Organisation $organisation,
-        Filing $filing
-    ): Collection {
-        $this->ensureFilingBelongsToOrganisation(
-            $organisation,
-            $filing
-        );
-
-        return $filing->versions()
-            ->with('preparedBy')
+    public function all(int $filingId): Collection
+    {
+        return FilingVersion::query()
+            ->where('filing_id', $filingId)
+            ->with([
+                'filing',
+                'formVersion.formDefinition',
+                'preparedBy',
+                'supersedesVersion',
+            ])
             ->orderByDesc('version_number')
             ->get();
     }
 
     public function find(
-        Organisation $organisation,
-        Filing $filing,
-        int $versionId
+        int $filingId,
+        int $filingVersionId
     ): FilingVersion {
-        $this->ensureFilingBelongsToOrganisation(
-            $organisation,
-            $filing
-        );
-
-        return $filing->versions()
+        return FilingVersion::query()
+            ->where('filing_id', $filingId)
             ->with([
+                'filing',
+                'formVersion.formDefinition',
                 'preparedBy',
-                'supersedes',
+                'supersedesVersion',
             ])
-            ->where('id', $versionId)
-            ->firstOrFail();
+            ->findOrFail($filingVersionId);
     }
 
+    /**
+     * Create the first filing version.
+     *
+     * The correct published form version is selected automatically
+     * from the filing's filing type.
+     */
     public function create(
-        Organisation $organisation,
-        Filing $filing,
-        array $data,
-        int $userId
+        int $filingId,
+        int $userId,
+        ?string $revisionReason = null
     ): FilingVersion {
-        $this->ensureFilingBelongsToOrganisation(
-            $organisation,
-            $filing
-        );
-
         return DB::transaction(function () use (
-            $organisation,
-            $filing,
-            $data,
-            $userId
+            $filingId,
+            $userId,
+            $revisionReason
         ) {
-            $latestVersion = $filing->versions()
+            $filing = Filing::query()
+                ->with('filingType')
+                ->whereKey($filingId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            /*
+             * Find the latest published form version for
+             * this filing's filing type.
+             */
+            $formVersion = $this->getPublishedFormVersion(
+                $filing->filing_type_id
+            );
+
+            $existingVersion = FilingVersion::query()
+                ->where('filing_id', $filing->id)
                 ->orderByDesc('version_number')
+                ->lockForUpdate()
                 ->first();
 
-            $nextVersion = $latestVersion
-                ? $latestVersion->version_number + 1
-                : 1;
+            $versionNumber = ($existingVersion?->version_number ?? 0) + 1;
 
-            $version = FilingVersion::create([
+            $filingVersion = FilingVersion::query()->create([
                 'filing_id' => $filing->id,
-                'organisation_id' => $organisation->id,
-                'version_number' => $nextVersion,
-                'supersedes_version_id' => $latestVersion?->id,
-                'revision_reason' => $data['revision_reason'] ?? null,
+                'organisation_id' => $filing->organisation_id,
+                'form_version_id' => $formVersion->id,
+                'version_number' => $versionNumber,
+                'supersedes_version_id' => $existingVersion?->id,
+                'revision_reason' => $revisionReason,
                 'prepared_by' => $userId,
                 'prepared_at' => now(),
             ]);
 
-            return $version->load([
+            return $filingVersion->fresh()->load([
+                'filing',
+                'formVersion.formDefinition',
                 'preparedBy',
-                'supersedes',
+                'supersedesVersion',
             ]);
         });
     }
 
-    private function ensureFilingBelongsToOrganisation(
-        Organisation $organisation,
-        Filing $filing
-    ): void {
-        if ($filing->organisation_id !== $organisation->id) {
-            abort(404, 'Filing not found.');
+    /**
+     * Get the currently published form version
+     * for a particular filing type.
+     */
+    private function getPublishedFormVersion(
+        int $filingTypeId
+    ): FormVersion {
+        $formVersion = FormVersion::query()
+            ->where('status', 'published')
+            ->whereHas('formDefinition', function ($query) use ($filingTypeId) {
+                $query->where('filing_type_id', $filingTypeId)
+                    ->where('is_active', true);
+            })
+            ->with('formDefinition')
+            ->orderByDesc('published_at')
+            ->orderByDesc('version_number')
+            ->first();
+
+        if (! $formVersion) {
+            throw ValidationException::withMessages([
+                'form_version' => [
+                    'No published form version is available for this filing type.',
+                ],
+            ]);
         }
+
+        return $formVersion;
     }
 }

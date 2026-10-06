@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\FormVersion;
+use App\Models\Filing;
+use App\Models\Organisation;
+use App\Models\User;
 
 class FilingVersion extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'filing_id',
         'organisation_id',
@@ -23,14 +25,11 @@ class FilingVersion extends Model
         'content_hash',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'version_number' => 'integer',
-            'prepared_at' => 'datetime',
-            'locked_at' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'version_number' => 'integer',
+        'prepared_at' => 'datetime',
+        'locked_at' => 'datetime',
+    ];
 
     public function filing(): BelongsTo
     {
@@ -42,21 +41,24 @@ class FilingVersion extends Model
         return $this->belongsTo(Organisation::class);
     }
 
-    public function supersedes(): BelongsTo
+    public function formVersion(): BelongsTo
     {
-        return $this->belongsTo(
-            FilingVersion::class,
-            'supersedes_version_id'
-        );
+        return $this->belongsTo(FormVersion::class);
     }
 
     public function preparedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'prepared_by');
     }
-    
-    public function formVersion(): BelongsTo
+
+    /**
+     * The previous filing version that this version replaces.
+     */
+    public function supersedesVersion(): BelongsTo
     {
-        return $this->belongsTo(FormVersion::class);
+        return $this->belongsTo(
+            FilingVersion::class,
+            'supersedes_version_id'
+        );
     }
 }

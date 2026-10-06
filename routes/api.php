@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\FormDefinitionController;
 use App\Http\Controllers\Api\V1\FormVersionController;
 use App\Http\Controllers\Api\V1\FormSectionController;
 use App\Http\Controllers\Api\V1\FormFieldController;
+use App\Http\Controllers\Api\V1\FilingFormController;
 
 
 Route::prefix('v1')->group(function () {
@@ -52,6 +53,20 @@ Route::prefix('v1')->group(function () {
 
 
         
+    });
+
+    Route::middleware([
+    'auth:sanctum',
+    'organisation',
+    ])->prefix('organisations/{organisationId}')->group(function () {
+
+        Route::get(
+            'filings/{filingId}/form',
+            [FilingFormController::class, 'show']
+        )
+            ->whereNumber('organisationId')
+            ->whereNumber('filingId');
+
     });
 
     // Route::middleware([

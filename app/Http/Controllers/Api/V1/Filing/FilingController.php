@@ -10,11 +10,13 @@ use App\Services\ApiResponseService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Services\FilingVersionService;
 
 class FilingController extends Controller
 {
     public function __construct(
-        protected ApiResponseService $apiResponse
+        protected ApiResponseService $apiResponse,
+        protected FilingVersionService $filingVersionService
     ) {}
 
     /**
@@ -79,9 +81,9 @@ class FilingController extends Controller
         ]);
 
         /*
-         * Make sure the filing subject belongs
-         * to the current organisation.
-         */
+        * Make sure the filing subject belongs
+        * to the current organisation.
+        */
         $subject = FilingSubject::where(
             'id',
             $validated['filing_subject_id']
@@ -100,8 +102,8 @@ class FilingController extends Controller
         }
 
         /*
-         * Make sure filing type is active.
-         */
+        * Make sure filing type is active.
+        */
         $filingType = FilingType::where(
             'id',
             $validated['filing_type_id']
@@ -121,7 +123,11 @@ class FilingController extends Controller
             $validated,
             $request
         ) {
-            return Filing::create([
+
+            /*
+            * 1. Create Filing
+            */
+            $filing = Filing::create([
                 'organisation_id' => $organisationId,
                 'filing_subject_id' => $validated['filing_subject_id'],
                 'filing_type_id' => $validated['filing_type_id'],
@@ -129,17 +135,35 @@ class FilingController extends Controller
                 'status' => 'draft',
                 'prepared_by' => $request->user()->id,
             ]);
+
+            /*
+            * 2. Automatically create Filing Version 1
+            *
+            * This will also attach the currently
+            * published Form Version.
+            */
+            $this->filingVersionService->create(
+                $filing->id,
+                $request->user()->id
+            );
+
+            return $filing;
         });
 
+        /*
+        * Load everything needed by the API response.
+        */
         $filing->load([
             'filingSubject',
             'filingType',
             'preparer',
+            'versions.formVersion.formDefinition',
         ]);
 
-        return $this->apiResponse->created(
+        return $this->apiResponse->success(
+            'Filing created successfully.',
             $filing,
-            'Filing created successfully.'
+            201
         );
     }
 
