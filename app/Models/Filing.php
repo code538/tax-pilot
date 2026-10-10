@@ -72,4 +72,9 @@ class Filing extends Model
         return $this->hasOne(FilingVersion::class)
             ->latestOfMany('version_number');
     }
+
+    public function fieldValues()
+    {
+        return $this->hasMany(FilingFieldValue::class);
+    }
 }

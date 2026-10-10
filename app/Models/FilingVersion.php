@@ -61,4 +61,9 @@ class FilingVersion extends Model
             'supersedes_version_id'
         );
     }
+
+    public function fieldValues()
+    {
+        return $this->hasMany(FilingFieldValue::class);
+    }
 }

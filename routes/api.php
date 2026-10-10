@@ -11,12 +11,15 @@ use App\Http\Controllers\Api\V1\Organisation\OrganisationInvitationController;
 use App\Http\Controllers\Api\V1\Auth\InvitationController;
 use App\Http\Controllers\Api\V1\FilingSubject\FilingSubjectController;
 use App\Http\Controllers\Api\V1\Filing\FilingController;
+use App\Http\Controllers\Api\V1\Filing\FilingTypeController;
 use App\Http\Controllers\Api\V1\Filing\FilingVersionController;
 use App\Http\Controllers\Api\V1\FormDefinitionController;
 use App\Http\Controllers\Api\V1\FormVersionController;
 use App\Http\Controllers\Api\V1\FormSectionController;
 use App\Http\Controllers\Api\V1\FormFieldController;
 use App\Http\Controllers\Api\V1\FilingFormController;
+use App\Http\Controllers\Api\V1\Filing\FilingFieldValueController;
+
 
 
 Route::prefix('v1')->group(function () {
@@ -465,6 +468,58 @@ Route::prefix('v1')->group(function () {
          ->whereNumber('formSectionId');
 
     });  
+
+    Route::middleware([
+        'auth:sanctum',
+        'organisation',
+    ])
+        ->prefix('organisations/{organisationId}')
+        ->group(function () {
+
+            Route::get(
+                'filings/{filingId}/versions/{filingVersionId}/values',
+                [FilingFieldValueController::class, 'index']
+            );
+
+            Route::post(
+                'filings/{filingId}/versions/{filingVersionId}/values',
+                [FilingFieldValueController::class, 'store']
+            );
+        });
+
+        Route::prefix('filing-types')->group(function () {
+
+            Route::get('/', [
+                FilingTypeController::class,
+                'index',
+            ]);
+
+            Route::post('/', [
+                FilingTypeController::class,
+                'store',
+            ]);
+
+            Route::get('/{filingTypeId}', [
+                FilingTypeController::class,
+                'show',
+            ]);
+
+            Route::put('/{filingTypeId}', [
+                FilingTypeController::class,
+                'update',
+            ]);
+
+            Route::patch('/{filingTypeId}', [
+                FilingTypeController::class,
+                'update',
+            ]);
+
+            Route::delete('/{filingTypeId}', [
+                FilingTypeController::class,
+                'destroy',
+            ]);
+        });
+    
     
   
 

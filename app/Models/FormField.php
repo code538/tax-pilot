@@ -40,4 +40,9 @@ class FormField extends Model
     {
         return $this->belongsTo(FormSection::class, 'form_section_id');
     }
+
+    public function filingValues()
+    {
+        return $this->hasMany(FilingFieldValue::class);
+    }
 }
