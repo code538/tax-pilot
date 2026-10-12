@@ -19,10 +19,52 @@ use App\Http\Controllers\Api\V1\FormSectionController;
 use App\Http\Controllers\Api\V1\FormFieldController;
 use App\Http\Controllers\Api\V1\FilingFormController;
 use App\Http\Controllers\Api\V1\Filing\FilingFieldValueController;
+use App\Http\Controllers\Api\V1\Faq\FaqController;
+use App\Http\Controllers\Api\V1\LegalPage\LegalPageController;
 
 
 
 Route::prefix('v1')->group(function () {
+
+    //For Website porpose
+    Route::prefix('faqs')->group(function () {
+        Route::get('/', [FaqController::class, 'publicIndex']);
+        Route::get('/{slug}', [FaqController::class, 'publicBySlug']);
+    });
+
+    Route::prefix('legal-pages')->group(function () {
+        Route::get('/', [LegalPageController::class, 'publicIndex']);
+        Route::get('/{slug}', [LegalPageController::class, 'publicShow']);
+    });
+
+
+    Route::middleware(['auth:sanctum', 'super.admin'])
+    ->prefix('admin/faqs')
+    ->group(function () {
+        Route::get('/', [FaqController::class, 'index']);
+        Route::post('/', [FaqController::class, 'store']);
+        Route::get('/{id}', [FaqController::class, 'show']);
+        Route::put('/{id}', [FaqController::class, 'update']);
+        Route::patch('/{id}', [FaqController::class, 'update']);
+        Route::delete('/{id}', [FaqController::class, 'destroy']);
+    });
+
+    Route::middleware(['auth:sanctum', 'super.admin'])
+    ->prefix('admin/legal-pages')
+    ->group(function () {
+        Route::get('/', [LegalPageController::class, 'index']);
+        Route::post('/', [LegalPageController::class, 'store']);
+        Route::get('/{id}', [LegalPageController::class, 'show']);
+        Route::put('/{id}', [LegalPageController::class, 'update']);
+        Route::patch('/{id}', [LegalPageController::class, 'update']);
+        Route::delete('/{id}', [LegalPageController::class, 'destroy']);
+    });
+
+
+
+
+
+    //For application purpose
 
     Route::prefix('auth')->group(function () {
 
