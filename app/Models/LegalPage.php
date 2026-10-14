@@ -12,6 +12,7 @@ class LegalPage extends Model
         'slug',
         'title',
         'description',
+        'is_order',
         'is_active',
     ];
 
@@ -19,6 +20,7 @@ class LegalPage extends Model
     {
         return [
             'is_active' => 'boolean',
+            'is_order' => 'integer',
         ];
     }
 

@@ -69,6 +69,7 @@ class LegalPageController extends Controller
             'page_name' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'is_order' => ['sometimes', 'integer'],
             'is_active' => ['sometimes', 'boolean'],
         ]);
 
@@ -88,6 +89,7 @@ class LegalPageController extends Controller
             'page_name' => ['sometimes', 'required', 'string', 'max:255'],
             'title' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['sometimes', 'required', 'string'],
+            'is_order' => ['sometimes', 'integer'],
             'is_active' => ['sometimes', 'boolean'],
         ]);
 

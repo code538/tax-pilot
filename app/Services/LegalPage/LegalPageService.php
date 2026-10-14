@@ -36,6 +36,7 @@ class LegalPageService
     {
         return LegalPage::where('slug', $slug)
             ->where('is_active', true)
+            ->orderBy('is_order')
             ->get();
     }
 
