@@ -21,6 +21,8 @@ use App\Http\Controllers\Api\V1\FilingFormController;
 use App\Http\Controllers\Api\V1\Filing\FilingFieldValueController;
 use App\Http\Controllers\Api\V1\Faq\FaqController;
 use App\Http\Controllers\Api\V1\LegalPage\LegalPageController;
+use App\Http\Controllers\Api\V1\WebsiteContent\FeatureFirstSectionController;
+use App\Http\Controllers\Api\V1\WebsiteContent\FeatureSecondSectionController;
 
 
 
@@ -35,6 +37,18 @@ Route::prefix('v1')->group(function () {
     Route::prefix('legal-pages')->group(function () {
         Route::get('/', [LegalPageController::class, 'publicIndex']);
         Route::get('/{slug}', [LegalPageController::class, 'publicShow']);
+    });
+
+    Route::prefix('website-content')->group(function () {
+        Route::get('/feature-first-section/{slug}', [
+            FeatureFirstSectionController::class,
+            'publicShow',
+        ]);
+
+        Route::get('/feature-second-section/{slug}', [
+            FeatureSecondSectionController::class,
+            'publicShow',
+        ]);
     });
 
 
@@ -568,5 +582,70 @@ Route::prefix('v1')->group(function () {
     Route::post('invitations/{token}/accept',
         [InvitationController::class, 'accept']
     );
+
+
+    Route::middleware(['auth:sanctum', 'super.admin'])
+    ->prefix('admin/website-content')
+    ->group(function () {
+        Route::get('/feature-first-section/', [
+            FeatureFirstSectionController::class,
+            'index',
+        ]);
+
+        Route::post('/feature-first-section/', [
+            FeatureFirstSectionController::class,
+            'store',
+        ]);
+
+        Route::get('/feature-first-section/{id}', [
+            FeatureFirstSectionController::class,
+            'show',
+        ]);
+
+        Route::put('/feature-first-section/{id}', [
+            FeatureFirstSectionController::class,
+            'update',
+        ]);
+
+        Route::patch('/feature-first-section/{id}', [
+            FeatureFirstSectionController::class,
+            'update',
+        ]);
+
+        Route::delete('/feature-first-section/{id}', [
+            FeatureFirstSectionController::class,
+            'destroy',
+        ]);
+
+        Route::get('/feature-second-section/', [
+            FeatureSecondSectionController::class,
+            'index',
+        ]);
+
+        Route::post('/feature-second-section/', [
+            FeatureSecondSectionController::class,
+            'store',
+        ]);
+
+        Route::get('/feature-second-section/{id}', [
+            FeatureSecondSectionController::class,
+            'show',
+        ]);
+
+        Route::put('/feature-second-section/{id}', [
+            FeatureSecondSectionController::class,
+            'update',
+        ]);
+
+        Route::patch('/feature-second-section/{id}', [
+            FeatureSecondSectionController::class,
+            'update',
+        ]);
+
+        Route::delete('/feature-second-section/{id}', [
+            FeatureSecondSectionController::class,
+            'destroy',
+        ]);
+    });
 
 });

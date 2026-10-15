@@ -1,0 +1,27 @@
+
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('feature_second_section', function (Blueprint $table) {
+            $table->id();
+            $table->string('page_title');
+            $table->string('slug')->index();
+            $table->string('title');
+            $table->string('heading');
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('feature_second_section');
+    }
+};
