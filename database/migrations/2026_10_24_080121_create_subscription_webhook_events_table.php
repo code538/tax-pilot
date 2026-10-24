@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('subscription_webhook_events', function (Blueprint $table) {
+            $table->id();
+
+            $table->string('provider', 30)->default('stripe');
+
+            $table->string('event_id')->unique();
+            $table->string('event_type', 150);
+
+            $table->string('status', 30)->default('received');
+
+            $table->timestamp('processed_at')->nullable();
+            $table->text('error_message')->nullable();
+
+            $table->timestamps();
+
+            $table->index([
+                'provider',
+                'status',
+            ], 'subscription_webhook_status_idx');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('subscription_webhook_events');
+    }
+};

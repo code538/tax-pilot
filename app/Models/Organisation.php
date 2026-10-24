@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\FilingSubject;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Organisation extends Model
 {
@@ -82,5 +83,13 @@ class Organisation extends Model
     public function filings()
     {
         return $this->hasMany(Filing::class);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(
+            OrganisationSubscription::class,
+            'organisation_id'
+        );
     }
 }

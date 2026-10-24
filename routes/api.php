@@ -23,6 +23,12 @@ use App\Http\Controllers\Api\V1\Faq\FaqController;
 use App\Http\Controllers\Api\V1\LegalPage\LegalPageController;
 use App\Http\Controllers\Api\V1\WebsiteContent\FeatureFirstSectionController;
 use App\Http\Controllers\Api\V1\WebsiteContent\FeatureSecondSectionController;
+use App\Http\Controllers\Api\V1\WebsiteContent\FeatureThirdSectionController;
+use App\Http\Controllers\Api\V1\WebsiteContent\FeatureForthSectionController;
+use App\Http\Controllers\Api\V1\WebsiteContent\FeatureFifthSectionController;
+use App\Http\Controllers\Api\V1\WebsiteContent\FeatureSixSectionController;
+use App\Http\Controllers\Api\V1\WebsiteContent\FeatureSeventhSectionController;
+use App\Http\Controllers\Api\V1\Subscription\SubscriptionPricingController;
 
 
 
@@ -50,6 +56,17 @@ Route::prefix('v1')->group(function () {
             'publicShow',
         ]);
     });
+
+    // Subscription Pricing API
+    Route::get(
+        '/subscription-products',
+        [SubscriptionPricingController::class, 'index']
+    );
+
+    Route::get(
+        '/subscription-products/{slug}',
+        [SubscriptionPricingController::class, 'show']
+    );
 
 
     Route::middleware(['auth:sanctum', 'super.admin'])
@@ -646,6 +663,41 @@ Route::prefix('v1')->group(function () {
             FeatureSecondSectionController::class,
             'destroy',
         ]);
+
+        Route::get('/feature-third-section', [FeatureThirdSectionController::class, 'index']);
+        Route::post('/feature-third-section', [FeatureThirdSectionController::class, 'store']);
+        Route::get('/feature-third-section/{id}', [FeatureThirdSectionController::class, 'show']);
+        Route::put('/feature-third-section/{id}', [FeatureThirdSectionController::class, 'update']);
+        Route::patch('/feature-third-section/{id}', [FeatureThirdSectionController::class, 'update']);
+        Route::delete('/feature-third-section/{id}', [FeatureThirdSectionController::class, 'destroy']);
+
+        Route::get('/feature-fourth-section', [FeatureForthSectionController::class, 'index']);
+        Route::post('/feature-fourth-section', [FeatureForthSectionController::class, 'store']);
+        Route::get('/feature-fourth-section/{id}', [FeatureForthSectionController::class, 'show']);
+        Route::put('/feature-fourth-section/{id}', [FeatureForthSectionController::class, 'update']);
+        Route::patch('/feature-fourth-section/{id}', [FeatureForthSectionController::class, 'update']);
+        Route::delete('/feature-fourth-section/{id}', [FeatureForthSectionController::class, 'destroy']);
+
+        Route::get('/feature-fifth-section', [FeatureFifthSectionController::class, 'index']);
+        Route::post('/feature-fifth-section', [FeatureFifthSectionController::class, 'store']);
+        Route::get('/feature-fifth-section/{id}', [FeatureFifthSectionController::class, 'show']);
+        Route::put('/feature-fifth-section/{id}', [FeatureFifthSectionController::class, 'update']);
+        Route::patch('/feature-fifth-section/{id}', [FeatureFifthSectionController::class, 'update']);
+        Route::delete('/feature-fifth-section/{id}', [FeatureFifthSectionController::class, 'destroy']);
+
+        Route::get('/feature-six-section', [FeatureSixSectionController::class, 'index']);
+        Route::post('/feature-six-section', [FeatureSixSectionController::class, 'store']);
+        Route::get('/feature-six-section/{id}', [FeatureSixSectionController::class, 'show']);
+        Route::put('/feature-six-section/{id}', [FeatureSixSectionController::class, 'update']);
+        Route::patch('/feature-six-section/{id}', [FeatureSixSectionController::class, 'update']);
+        Route::delete('/feature-six-section/{id}', [FeatureSixSectionController::class, 'destroy']);
+
+        Route::get('/feature-seventh-section', [FeatureSeventhSectionController::class, 'index']);
+        Route::post('/feature-seventh-section', [FeatureSeventhSectionController::class, 'store']);
+        Route::get('/feature-seventh-section/{id}', [FeatureSeventhSectionController::class, 'show']);
+        Route::put('/feature-seventh-section/{id}', [FeatureSeventhSectionController::class, 'update']);
+        Route::patch('/feature-seventh-section/{id}', [FeatureSeventhSectionController::class, 'update']);
+        Route::delete('/feature-seventh-section/{id}', [FeatureSeventhSectionController::class, 'destroy']);
     });
 
 });
