@@ -28,7 +28,13 @@ use App\Http\Controllers\Api\V1\WebsiteContent\FeatureForthSectionController;
 use App\Http\Controllers\Api\V1\WebsiteContent\FeatureFifthSectionController;
 use App\Http\Controllers\Api\V1\WebsiteContent\FeatureSixSectionController;
 use App\Http\Controllers\Api\V1\WebsiteContent\FeatureSeventhSectionController;
+
 use App\Http\Controllers\Api\V1\Subscription\SubscriptionPricingController;
+use App\Http\Controllers\Api\V1\Subscription\Admin\SubscriptionProductController;
+use App\Http\Controllers\Api\V1\Subscription\Admin\SubscriptionPlanController;
+use App\Http\Controllers\Api\V1\Subscription\Admin\SubscriptionPlanFeatureController;
+use App\Http\Controllers\Api\V1\Subscription\Admin\SubscriptionPlanPriceController;
+use App\Http\Controllers\Api\V1\Subscription\Admin\SubscriptionPlanFilingTypeController;
 
 
 
@@ -286,6 +292,94 @@ Route::prefix('v1')->group(function () {
          ->whereNumber('formSectionId')
          ->whereNumber('formFieldId');
 
+        // subscription product and plan routes
+        Route::apiResource('subscription-products', SubscriptionProductController::class);
+
+        // Subscription plans
+        Route::apiResource('subscription-plans', SubscriptionPlanController::class); 
+
+        Route::get(
+            'subscription-plans/{planId}/features',
+            [SubscriptionPlanFeatureController::class, 'index']
+        );
+        Route::post(
+            'subscription-plans/{planId}/features',
+            [SubscriptionPlanFeatureController::class, 'store']
+        );
+        Route::get(
+            'subscription-plans/{planId}/features/{featureId}',
+            [SubscriptionPlanFeatureController::class, 'show']
+        );
+        Route::put(
+            'subscription-plans/{planId}/features/{featureId}',
+            [SubscriptionPlanFeatureController::class, 'update']
+        );
+        Route::patch(
+            'subscription-plans/{planId}/features/{featureId}',
+            [SubscriptionPlanFeatureController::class, 'update']
+        );
+        Route::delete(
+            'subscription-plans/{planId}/features/{featureId}',
+            [SubscriptionPlanFeatureController::class, 'destroy']
+        );
+
+        // Subscription plan prices 
+        Route::get(
+            'subscription-plans/{planId}/prices',
+            [SubscriptionPlanPriceController::class, 'index']
+        );
+
+        Route::post(
+            'subscription-plans/{planId}/prices',
+            [SubscriptionPlanPriceController::class, 'store']
+        );
+
+        Route::get(
+            'subscription-plans/{planId}/prices/{priceId}',
+            [SubscriptionPlanPriceController::class, 'show']
+        );
+
+        Route::put(
+            'subscription-plans/{planId}/prices/{priceId}',
+            [SubscriptionPlanPriceController::class, 'update']
+        );
+
+        Route::patch(
+            'subscription-plans/{planId}/prices/{priceId}',
+            [SubscriptionPlanPriceController::class, 'update']
+        );
+
+        Route::delete(
+            'subscription-plans/{planId}/prices/{priceId}',
+            [SubscriptionPlanPriceController::class, 'destroy']
+        );
+
+        // Subscription plan filing types
+        Route::get(
+            'subscription-plans/{planId}/filing-types',
+            [SubscriptionPlanFilingTypeController::class, 'index']
+        );
+        Route::post(
+            'subscription-plans/{planId}/filing-types',
+            [SubscriptionPlanFilingTypeController::class, 'store']
+        );
+        Route::get(
+            'subscription-plans/{planId}/filing-types/{mappingId}',
+            [SubscriptionPlanFilingTypeController::class, 'show']
+        );
+        Route::put(
+            'subscription-plans/{planId}/filing-types/{mappingId}',
+            [SubscriptionPlanFilingTypeController::class, 'update']
+        );
+        Route::patch(
+            'subscription-plans/{planId}/filing-types/{mappingId}',
+            [SubscriptionPlanFilingTypeController::class, 'update']
+        );
+        Route::delete(
+            'subscription-plans/{planId}/filing-types/{mappingId}',
+            [SubscriptionPlanFilingTypeController::class, 'destroy']
+        );
+
         
 
     });
@@ -419,28 +513,28 @@ Route::prefix('v1')->group(function () {
         'auth:sanctum',
         'organisation',
     ])
-        ->prefix('organisations/{organisationId}')
-        ->group(function () {
+    ->prefix('organisations/{organisationId}')
+    ->group(function () {
 
-            Route::prefix('filings/{filingId}/versions')
-                ->group(function () {
+        Route::prefix('filings/{filingId}/versions')
+            ->group(function () {
 
-                    Route::get(
-                        '/',
-                        [FilingVersionController::class, 'index']
-                    );
+                Route::get(
+                    '/',
+                    [FilingVersionController::class, 'index']
+                );
 
-                    Route::post(
-                        '/',
-                        [FilingVersionController::class, 'store']
-                    );
+                Route::post(
+                    '/',
+                    [FilingVersionController::class, 'store']
+                );
 
-                    Route::get(
-                        '/{versionId}',
-                        [FilingVersionController::class, 'show']
-                    );
-                });
-        });
+                Route::get(
+                    '/{versionId}',
+                    [FilingVersionController::class, 'show']
+                );
+            });
+    });
 
     
     Route::middleware('auth:sanctum')

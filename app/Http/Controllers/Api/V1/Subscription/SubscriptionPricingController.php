@@ -20,7 +20,7 @@ class SubscriptionPricingController extends Controller
      * Get all active products and their plans.
      */
     public function index(): AnonymousResourceCollection
-    {
+    {   //dd('okk');
         $products = $this->subscriptionPricingService
             ->getActiveProducts();
 

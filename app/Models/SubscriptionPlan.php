@@ -16,6 +16,12 @@ class SubscriptionPlan extends Model
         'name',
         'slug',
         'description',
+
+        'tagline',
+        'badge_text',
+        'button_text',
+        'display_group',
+
         'is_active',
         'is_featured',
         'sort_order',
@@ -83,5 +89,13 @@ class SubscriptionPlan extends Model
             OrganisationSubscription::class,
             'subscription_plan_id'
         );
+    }
+
+    public function features(): HasMany
+    {
+        return $this->hasMany(
+            SubscriptionPlanFeature::class,
+            'subscription_plan_id'
+        )->orderBy('sort_order');
     }
 }
