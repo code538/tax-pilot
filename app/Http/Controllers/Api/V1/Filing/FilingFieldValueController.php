@@ -44,7 +44,7 @@ class FilingFieldValueController extends Controller
         $filingId,
         $filingVersionId
     ) {
-        dd($request->all());
+        //dd($request->all());
         $validated = $request->validate([
             'values' => [
                 'required',
@@ -61,7 +61,7 @@ class FilingFieldValueController extends Controller
                 'nullable',
             ],
         ]);
-
+        dd($validated);
         $values = $this->filingFieldValueService->save(
             $organisationId,
             $filingId,
