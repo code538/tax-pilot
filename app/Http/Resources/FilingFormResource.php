@@ -18,6 +18,11 @@ class FilingFormResource extends JsonResource
                 'status' => $this->filing->status,
             ],
 
+            'filing_version' => [
+                'id' => $this->id,
+                'version_number' => $this->version_number,
+            ],
+
             'form' => [
                 'id' => $formVersion->formDefinition->id,
                 'name' => $formVersion->formDefinition->name,
