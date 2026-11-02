@@ -49,7 +49,7 @@ class FilingFieldValueService
             $organisationId,
             $filingId
         );
-
+        dd($values);
         $version = FilingVersion::query()
             ->where('id', $filingVersionId)
             ->where('filing_id', $filing->id)
