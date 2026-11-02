@@ -44,6 +44,7 @@ class FilingFieldValueController extends Controller
         $filingId,
         $filingVersionId
     ) {
+        dd($request->all());
         $validated = $request->validate([
             'values' => [
                 'required',

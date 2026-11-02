@@ -35,6 +35,10 @@ use App\Http\Controllers\Api\V1\Subscription\Admin\SubscriptionPlanController;
 use App\Http\Controllers\Api\V1\Subscription\Admin\SubscriptionPlanFeatureController;
 use App\Http\Controllers\Api\V1\Subscription\Admin\SubscriptionPlanPriceController;
 use App\Http\Controllers\Api\V1\Subscription\Admin\SubscriptionPlanFilingTypeController;
+use App\Http\Controllers\Api\V1\Subscription\Admin\SubscriptionPlanEntitlementController;
+use App\Http\Controllers\Api\V1\Subscription\OrganisationSubscriptionController;
+use App\Http\Controllers\Api\V1\Subscription\PayPalCheckoutController;
+use App\Http\Controllers\Api\V1\Subscription\PayPalCaptureController;
 
 
 
@@ -378,6 +382,37 @@ Route::prefix('v1')->group(function () {
         Route::delete(
             'subscription-plans/{planId}/filing-types/{mappingId}',
             [SubscriptionPlanFilingTypeController::class, 'destroy']
+        );
+
+        // Subscription plan entitlements
+        Route::get(
+            'subscription-plans/{planId}/entitlements',
+            [SubscriptionPlanEntitlementController::class, 'index']
+        );
+
+        Route::post(
+            'subscription-plans/{planId}/entitlements',
+            [SubscriptionPlanEntitlementController::class, 'store']
+        );
+
+        Route::get(
+            'subscription-plans/{planId}/entitlements/{entitlementId}',
+            [SubscriptionPlanEntitlementController::class, 'show']
+        );
+
+        Route::put(
+            'subscription-plans/{planId}/entitlements/{entitlementId}',
+            [SubscriptionPlanEntitlementController::class, 'update']
+        );
+
+        Route::patch(
+            'subscription-plans/{planId}/entitlements/{entitlementId}',
+            [SubscriptionPlanEntitlementController::class, 'update']
+        );
+
+        Route::delete(
+            'subscription-plans/{planId}/entitlements/{entitlementId}',
+            [SubscriptionPlanEntitlementController::class, 'destroy']
         );
 
         
@@ -792,6 +827,38 @@ Route::prefix('v1')->group(function () {
         Route::put('/feature-seventh-section/{id}', [FeatureSeventhSectionController::class, 'update']);
         Route::patch('/feature-seventh-section/{id}', [FeatureSeventhSectionController::class, 'update']);
         Route::delete('/feature-seventh-section/{id}', [FeatureSeventhSectionController::class, 'destroy']);
+    });
+
+    Route::middleware(['auth:sanctum', 'organisation'])
+    ->prefix('organisations/{organisationId}')
+    ->group(function () {
+
+        Route::get(
+            'subscription',
+            [OrganisationSubscriptionController::class, 'current']
+        );
+
+        Route::get(
+            'subscription/history',
+            [OrganisationSubscriptionController::class, 'history']
+        );
+
+        Route::get(
+            'subscription/history/{subscriptionId}',
+            [OrganisationSubscriptionController::class, 'show']
+        );
+
+        Route::post(
+            'subscription/checkout/paypal',
+            [PayPalCheckoutController::class, 'create']
+        );
+
+        Route::post(
+            'subscription/checkout/paypal/capture',
+            [PayPalCaptureController::class, 'capture']
+        );
+
+        
     });
 
 });
