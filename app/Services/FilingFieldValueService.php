@@ -125,8 +125,13 @@ class FilingFieldValueService
                 );
             }
 
-            return collect($saved)
-                ->load('formField');
+            // return collect($saved)
+            //     ->load('formField');
+
+            return FilingFieldValue::query()
+                ->with('formField')
+                ->where('filing_version_id', $version->id)
+                ->get();
         });
     }
 
