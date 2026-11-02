@@ -49,13 +49,13 @@ class FilingFieldValueService
             $organisationId,
             $filingId
         );
-        dd($values);
+        //dd($values);
         $version = FilingVersion::query()
             ->where('id', $filingVersionId)
             ->where('filing_id', $filing->id)
             ->with('formVersion')
             ->firstOrFail();
-
+        dd($version);
         /*
          * Do not allow editing a locked version.
          */
