@@ -235,7 +235,7 @@ class PayPalService
         }
 
         $data = $response->json();
-
+        //dd($data);
         $approvalUrl = collect($data['links'] ?? [])
             ->firstWhere('rel', 'approve')['href'] ?? null;
 
