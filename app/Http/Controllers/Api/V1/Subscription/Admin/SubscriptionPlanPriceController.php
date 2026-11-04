@@ -122,11 +122,11 @@ class SubscriptionPlanPriceController extends Controller
         $plan = SubscriptionPlan::query()->findOrFail($planId);
 
         $data = $request->validate([
-            // 'billing_interval' => [
-            //     'required',
-            //     Rule::in(['daily', 'weekly', 'monthly', 'quarterly', 'yearly']),
-            // ],
-            // 'interval_count' => ['sometimes', 'integer', 'min:1'],
+            'billing_interval' => [
+                'required',
+                Rule::in(['daily', 'weekly', 'monthly', 'quarterly', 'yearly']),
+            ],
+            'interval_count' => ['sometimes', 'integer', 'min:1'],
             'payment_mode' => [
                 'required',
                 Rule::in(['one_time', 'recurring']),
@@ -140,11 +140,11 @@ class SubscriptionPlanPriceController extends Controller
             //     Rule::in(['monthly', 'quarterly']),
             // ],
 
-            'interval_count' => [
-                'nullable',
-                'integer',
-                'min:1',
-            ],
+            // 'interval_count' => [
+            //     'nullable',
+            //     'integer',
+            //     'min:1',
+            // ],
 
             'amount_minor' => ['required', 'integer', 'min:0'],
             'currency' => ['sometimes', 'string', 'size:3', 'alpha'],
