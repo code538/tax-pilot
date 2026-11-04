@@ -115,7 +115,7 @@ class SubscriptionPlanPriceController extends Controller
     // }
 
 
-     public function store(Request $request, int $planId): JsonResponse
+    public function store(Request $request, int $planId): JsonResponse
     {
         $plan = SubscriptionPlan::query()->findOrFail($planId);
 

@@ -270,6 +270,14 @@ class PayPalCheckoutController extends Controller
     }
 
 
+    public function productID(): JsonResponse
+    {
+        $product = $this->paypalService->createProduct();
+
+        dd($product);
+    }
+
+
 
    
   

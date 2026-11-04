@@ -51,6 +51,11 @@ Route::prefix('v1')->group(function () {
         [PayPalWebhookController::class, 'handle']
     );
 
+    Route::get(
+        '/createproduct',
+        [PayPalCheckoutController::class, 'productID']
+    );
+
     //For Website porpose
     Route::prefix('faqs')->group(function () {
         Route::get('/', [FaqController::class, 'publicIndex']);

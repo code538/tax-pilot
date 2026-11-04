@@ -269,4 +269,134 @@ class PayPalService
 
         return $response->json('verification_status') === 'SUCCESS';
     }
+
+    /**
+     * Create a PayPal billing plan for recurring payments.
+     */
+    public function createBillingPlan(
+        string $name,
+        int $amountMinor,
+        string $currency,
+        string $interval,
+        int $intervalCount = 1
+    ): array {
+        $token = $this->getAccessToken();
+
+        // Convert minor currency units into the PayPal amount.
+        $amount = number_format($amountMinor / 100, 2, '.', '');
+
+        // Map application intervals to PayPal intervals.
+        $paypalInterval = match ($interval) {
+            'monthly' => 'MONTH',
+            'quarterly' => 'MONTH',
+            default => throw new RuntimeException(
+                'Unsupported PayPal billing interval.'
+            ),
+        };
+
+        // PayPal supports MONTH with an interval_count of 3
+        // for quarterly billing.
+        $paypalIntervalCount = $interval === 'quarterly'
+            ? 3 * $intervalCount
+            : $intervalCount;
+
+        $response = Http::withToken($token)
+            ->acceptJson()
+            ->asJson()
+            ->timeout(30)
+            ->withHeaders([
+                'PayPal-Request-Id' => (string) \Illuminate\Support\Str::uuid(),
+            ])
+            ->post($this->baseUrl() . '/v1/billing/plans', [
+                'product_id' => config('services.paypal.product_id'),
+
+                'name' => $name,
+
+                'description' => $name . ' subscription',
+
+                'status' => 'ACTIVE',
+
+                'billing_cycles' => [
+                    [
+                        'frequency' => [
+                            'interval_unit' => $paypalInterval,
+                            'interval_count' => $paypalIntervalCount,
+                        ],
+
+                        'tenure_type' => 'REGULAR',
+
+                        'sequence' => 1,
+
+                        'total_cycles' => 0,
+
+                        'pricing_scheme' => [
+                            'fixed_price' => [
+                                'value' => $amount,
+                                'currency_code' => strtoupper($currency),
+                            ],
+                        ],
+                    ],
+                ],
+
+                'payment_preferences' => [
+                    'auto_bill_outstanding' => true,
+                    'setup_fee_failure_action' => 'CANCEL',
+                    'payment_failure_threshold' => 3,
+                ],
+            ]);
+
+        if ($response->failed()) {
+            Log::error('PayPal billing plan creation failed', [
+                'http_status' => $response->status(),
+                'response' => $response->json(),
+            ]);
+
+            throw new RuntimeException(
+                'PayPal billing plan creation failed. HTTP status: '
+                . $response->status()
+            );
+        }
+
+        $data = $response->json();
+
+        if (empty($data['id'])) {
+            throw new RuntimeException(
+                'PayPal response did not contain a billing plan ID.'
+            );
+        }
+
+        return [
+            'id' => $data['id'],
+            'status' => $data['status'] ?? null,
+        ];
+    }
+
+
+    public function createProduct(): array
+    {
+        $response = Http::withToken($this->getAccessToken())
+            ->acceptJson()
+            ->asJson()
+            ->timeout(30)
+            ->post($this->baseUrl() . '/v1/catalogs/products', [
+                'name' => 'Tax Pilot Subscription',
+                'description' => 'Tax Pilot subscription plans',
+                'type' => 'SERVICE',
+                'category' => 'SOFTWARE',
+            ]);
+
+        if ($response->failed()) {
+            Log::error('PayPal product creation failed', [
+                'status' => $response->status(),
+                'response' => $response->json(),
+            ]);
+
+            throw new RuntimeException(
+                'PayPal product creation failed. HTTP status: '
+                . $response->status()
+            );
+        }
+
+        return $response->json();
+    }
 }

@@ -48,6 +48,8 @@ return [
         
         'cancel_url' => env('PAYPAL_CANCEL_URL'),
 
+        'product_id' => env('PAYPAL_PRODUCT_ID'),
+
         'base_url' => env(
             'PAYPAL_BASE_URL',
             'https://api-m.sandbox.paypal.com'
