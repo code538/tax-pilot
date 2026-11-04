@@ -17,7 +17,8 @@ return new class extends Migration
             // for example, "recurring" or "one_time" payment modes.    
             $table->string('payment_mode', 20)->default('recurring');
             $table->string('paypal_plan_id')->nullable();
-            $table->string('billing_interval', 20)->default('yearly');
+            $table->string('billing_interval', 20)->nullable()
+                ->comment('For recurring payments, e.g., daily, weekly, monthly, quarterly, yearly');
             $table->unsignedInteger('interval_count')->default(1);
 
             // GBP 59.00 = 5900 pence.
