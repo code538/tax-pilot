@@ -178,6 +178,7 @@ class SubscriptionPlanPriceController extends Controller
        $data['interval_count'] = $data['payment_mode'] === 'recurring'
             ? ($data['interval_count'] ?? 1)
             : 1;
+        dd($data);    
         $data['currency'] = strtoupper($data['currency'] ?? 'GBP');
         $data['is_active'] = $data['is_active'] ?? true;
 
