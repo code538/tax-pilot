@@ -44,7 +44,78 @@ class SubscriptionPlanPriceController extends Controller
     /**
      * Create a price for a plan.
      */
-    public function store(Request $request, int $planId): JsonResponse
+    // public function store(Request $request, int $planId): JsonResponse
+    // {
+    //     $plan = SubscriptionPlan::query()->findOrFail($planId);
+
+    //     $data = $request->validate([
+    //         // 'billing_interval' => [
+    //         //     'required',
+    //         //     Rule::in(['daily', 'weekly', 'monthly', 'quarterly', 'yearly']),
+    //         // ],
+    //         // 'interval_count' => ['sometimes', 'integer', 'min:1'],
+    //         'payment_mode' => [
+    //             'required',
+    //             Rule::in(['one_time', 'recurring']),
+    //         ],
+
+    //         'billing_interval' => [
+    //             'nullable',
+    //             Rule::requiredIf(
+    //                 fn () => $request->input('payment_mode') === 'recurring'
+    //             ),
+    //             Rule::in(['monthly', 'quarterly']),
+    //         ],
+
+    //         'interval_count' => [
+    //             'nullable',
+    //             'integer',
+    //             'min:1',
+    //         ],
+
+    //         'amount_minor' => ['required', 'integer', 'min:0'],
+    //         'currency' => ['sometimes', 'string', 'size:3', 'alpha'],
+    //         'stripe_product_id' => ['sometimes', 'nullable', 'string', 'max:255'],
+    //         'stripe_price_id' => [
+    //             'sometimes',
+    //             'nullable',
+    //             'string',
+    //             'max:255',
+    //             'unique:subscription_plan_prices,stripe_price_id',
+    //         ],
+    //         'is_active' => ['sometimes', 'boolean'],
+    //         'effective_from' => ['sometimes', 'nullable', 'date'],
+    //         'effective_until' => ['sometimes', 'nullable', 'date'],
+    //     ]);
+
+    //     $effectiveFrom = $data['effective_from'] ?? null;
+    //     $effectiveUntil = $data['effective_until'] ?? null;
+
+    //     if (
+    //         $effectiveFrom !== null &&
+    //         $effectiveUntil !== null &&
+    //         strtotime($effectiveUntil) <= strtotime($effectiveFrom)
+    //     ) {
+    //         throw ValidationException::withMessages([
+    //             'effective_until' => [
+    //                 'The effective_until date must be later than effective_from.',
+    //             ],
+    //         ]);
+    //     }
+
+    //     $data['interval_count'] = $data['interval_count'] ?? 1;
+    //     $data['currency'] = strtoupper($data['currency'] ?? 'GBP');
+    //     $data['is_active'] = $data['is_active'] ?? true;
+
+    //     $price = $this->service->createForPlan($plan, $data);
+
+    //     return (new SubscriptionPlanPriceAdminResource($price))
+    //         ->response()
+    //         ->setStatusCode(201);
+    // }
+
+
+     public function store(Request $request, int $planId): JsonResponse
     {
         $plan = SubscriptionPlan::query()->findOrFail($planId);
 
@@ -103,9 +174,23 @@ class SubscriptionPlanPriceController extends Controller
             ]);
         }
 
-        $data['interval_count'] = $data['interval_count'] ?? 1;
+       $data['interval_count'] = $data['interval_count'] ?? 1;
         $data['currency'] = strtoupper($data['currency'] ?? 'GBP');
         $data['is_active'] = $data['is_active'] ?? true;
+
+        if ($data['payment_mode'] === 'recurring') {
+            $paypalPlan = $this->paypalService->createBillingPlan(
+                name: $plan->name,
+                amountMinor: $data['amount_minor'],
+                currency: $data['currency'],
+                interval: $data['billing_interval'],
+                intervalCount: $data['interval_count'],
+            );
+
+            $data['paypal_plan_id'] = $paypalPlan['id'];
+        } else {
+            $data['paypal_plan_id'] = null;
+        }
 
         $price = $this->service->createForPlan($plan, $data);
 
