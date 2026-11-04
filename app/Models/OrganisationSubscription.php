@@ -86,13 +86,21 @@ class OrganisationSubscription extends Model
         ) {
             return false;
         }
-
+        //for single subscription, we can just check if the current period end date is in the past, if it is, then the subscription is no longer active
+        // if (
+        //     $this->current_period_ends_at !== null &&
+        //     $this->current_period_ends_at->isPast()
+        // ) {
+        //     return false;
+        // }
         if (
             $this->current_period_ends_at !== null &&
-            $this->current_period_ends_at->isPast()
+            $this->current_period_ends_at->lessThanOrEqualTo(now())
         ) {
             return false;
         }
+
+
 
         return true;
     }

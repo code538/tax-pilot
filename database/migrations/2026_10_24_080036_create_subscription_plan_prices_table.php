@@ -14,7 +14,9 @@ return new class extends Migration
             $table->foreignId('subscription_plan_id')
                 ->constrained('subscription_plans')
                 ->restrictOnDelete();
-
+            // for example, "recurring" or "one_time" payment modes.    
+            $table->string('payment_mode', 20)->default('recurring');
+            $table->string('paypal_plan_id')->nullable();
             $table->string('billing_interval', 20)->default('yearly');
             $table->unsignedInteger('interval_count')->default(1);
 

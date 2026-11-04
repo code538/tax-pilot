@@ -12,6 +12,7 @@ class SubscriptionPlanPriceAdminResource extends JsonResource
         return [
             'id' => $this->id,
             'subscription_plan_id' => $this->subscription_plan_id,
+            'payment_mode' => $this->payment_mode,
 
             'billing_interval' => $this->billing_interval,
             'interval_count' => $this->interval_count,

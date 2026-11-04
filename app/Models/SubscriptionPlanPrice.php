@@ -12,6 +12,7 @@ class SubscriptionPlanPrice extends Model
 
     protected $fillable = [
         'subscription_plan_id',
+        'payment_mode',
         'billing_interval',
         'interval_count',
         'amount_minor',

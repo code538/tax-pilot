@@ -39,10 +39,17 @@ use App\Http\Controllers\Api\V1\Subscription\Admin\SubscriptionPlanEntitlementCo
 use App\Http\Controllers\Api\V1\Subscription\OrganisationSubscriptionController;
 use App\Http\Controllers\Api\V1\Subscription\PayPalCheckoutController;
 use App\Http\Controllers\Api\V1\Subscription\PayPalCaptureController;
+use App\Http\Controllers\Api\V1\Subscription\PayPalWebhookController;
 
 
 
 Route::prefix('v1')->group(function () {
+
+    // Subscription PayPal Webhook
+    Route::post(
+        '/paypal/webhook',
+        [PayPalWebhookController::class, 'handle']
+    );
 
     //For Website porpose
     Route::prefix('faqs')->group(function () {

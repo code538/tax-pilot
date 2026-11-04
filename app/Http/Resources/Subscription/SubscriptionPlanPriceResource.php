@@ -12,6 +12,7 @@ class SubscriptionPlanPriceResource extends JsonResource
         return [
             'id' => $this->id,
             'billing_interval' => $this->billing_interval,
+            'payment_mode' => $this->payment_mode,
             'interval_count' => $this->interval_count,
             'amount_minor' => $this->amount_minor,
             'currency' => $this->currency,

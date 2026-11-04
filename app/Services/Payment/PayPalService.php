@@ -195,4 +195,78 @@ class PayPalService
 
         return $response->json();
     }
+
+    // create subscription for a plan using PayPal subscription API
+    public function createSubscription(
+        string $paypalPlanId,
+        string $customId
+    ): array {
+        $response = Http::withToken($this->getAccessToken())
+            ->acceptJson()
+            ->asJson()
+            ->timeout(30)
+            ->withHeaders([
+                'PayPal-Request-Id' => (string) \Illuminate\Support\Str::uuid(),
+            ])
+            ->post($this->baseUrl() . '/v1/billing/subscriptions', [
+                'plan_id' => $paypalPlanId,
+                'custom_id' => $customId,
+                'application_context' => [
+                    'brand_name' => config('app.name'),
+                    'return_url' => config('services.paypal.return_url'),
+                    'cancel_url' => config('services.paypal.cancel_url'),
+                    'user_action' => 'SUBSCRIBE_NOW',
+                ],
+            ]);
+
+        if ($response->failed()) {
+            \Illuminate\Support\Facades\Log::error(
+                'PayPal subscription creation failed',
+                [
+                    'http_status' => $response->status(),
+                    'response' => $response->json(),
+                ]
+            );
+
+            throw new \RuntimeException(
+                'PayPal subscription creation failed. HTTP status: '
+                . $response->status()
+            );
+        }
+
+        $data = $response->json();
+
+        $approvalUrl = collect($data['links'] ?? [])
+            ->firstWhere('rel', 'approve')['href'] ?? null;
+
+        if (empty($data['id']) || empty($approvalUrl)) {
+            throw new \RuntimeException(
+                'PayPal response did not contain a subscription ID or approval URL.'
+            );
+        }
+
+        return [
+            'id' => $data['id'],
+            'status' => $data['status'] ?? null,
+            'approval_url' => $approvalUrl,
+        ];
+    }
+
+    public function verifyWebhookSignature(array $headers, array $event): bool
+    {
+        $response = Http::withToken($this->getAccessToken())
+            ->post($this->baseUrl . '/v1/notifications/verify-webhook-signature', [
+                'auth_algo'         => $headers['auth_algo'] ?? null,
+                'cert_url'          => $headers['cert_url'] ?? null,
+                ' transmission_id'  => $headers['transmission_id'] ?? null,
+                'transmission_sig'  => $headers['transmission_sig'] ?? null,
+                'transmission_time' => $headers['transmission_time'] ?? null,
+                'webhook_id'        => config('services.paypal.webhook_id'),
+                'webhook_event'     => $event,
+            ]);
+
+        $response->throw();
+
+        return $response->json('verification_status') === 'SUCCESS';
+    }
 }
