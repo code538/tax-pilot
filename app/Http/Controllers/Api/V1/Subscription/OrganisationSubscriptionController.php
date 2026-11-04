@@ -17,7 +17,8 @@ use Throwable;
 class OrganisationSubscriptionController extends Controller
 {
     public function __construct(
-        protected OrganisationSubscriptionService $service
+        protected OrganisationSubscriptionService $service,
+        protected PayPalService $paypalService
     ) {
     }
 
