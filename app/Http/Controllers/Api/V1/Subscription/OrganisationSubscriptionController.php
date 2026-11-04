@@ -7,6 +7,11 @@ use App\Http\Resources\Subscription\OrganisationSubscriptionResource;
 use App\Services\Subscription\OrganisationSubscriptionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Models\OrganisationSubscription;
+use App\Services\Payment\PayPalService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 
 class OrganisationSubscriptionController extends Controller
@@ -120,5 +125,85 @@ class OrganisationSubscriptionController extends Controller
         );
 
         return new OrganisationSubscriptionResource($subscription);
+    }
+
+
+   
+
+    public function success(
+        Request $request,
+        PayPalService $paypalService
+    ): JsonResponse {
+        $paypalSubscriptionId = $request->query('subscription_id');
+
+        if (empty($paypalSubscriptionId)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'PayPal subscription ID is missing.',
+            ], 422);
+        }
+
+        try {
+            // Find the subscription created by your checkout controller.
+            $localSubscription = OrganisationSubscription::query()
+                ->where('provider', 'paypal')
+                ->where(
+                    'provider_subscription_id',
+                    $paypalSubscriptionId
+                )
+                ->firstOrFail();
+
+            // Verify the actual subscription status with PayPal.
+            $paypalSubscription = $paypalService->getSubscription(
+                $paypalSubscriptionId
+            );
+
+            $paypalStatus = $paypalSubscription['status'] ?? null;
+
+            // Map PayPal status to your local subscription status.
+            $status = match ($paypalStatus) {
+                'ACTIVE' => 'active',
+                'APPROVAL_PENDING' => 'pending',
+                'SUSPENDED' => 'suspended',
+                'CANCELLED', 'EXPIRED' => 'cancelled',
+                default => 'pending',
+            };
+
+            DB::transaction(function () use (
+                $localSubscription,
+                $paypalSubscription,
+                $status
+            ) {
+                $localSubscription->update([
+                    'status' => $status,
+                    'starts_at' => $paypalSubscription['start_time']
+                        ?? now(),
+                    'current_period_starts_at' => now(),
+                    'current_period_ends_at' =>
+                        $paypalSubscription['billing_info']['next_billing_time']
+                        ?? null,
+                ]);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => $status === 'active'
+                    ? 'Subscription activated successfully.'
+                    : 'PayPal subscription status updated.',
+                'data' => [
+                    'subscription_id' => $localSubscription->id,
+                    'status' => $status,
+                    'paypal_status' => $paypalStatus,
+                ],
+            ]);
+
+        } catch (Throwable $exception) {
+            report($exception);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Unable to verify PayPal subscription.',
+            ], 500);
+        }
     }
 }

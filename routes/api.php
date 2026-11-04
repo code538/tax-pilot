@@ -52,6 +52,11 @@ Route::prefix('v1')->group(function () {
     );
 
     Route::get(
+        '/subscription/success',
+        [OrganisationSubscriptionController::class, 'success']
+    )->name('paypal.subscription.success');
+
+    Route::get(
         '/createproduct',
         [PayPalCheckoutController::class, 'productID']
     );

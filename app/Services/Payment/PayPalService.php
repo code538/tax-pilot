@@ -371,6 +371,27 @@ class PayPalService
         ];
     }
 
+    public function getSubscription(string $subscriptionId): array
+    {
+        $response = Http::withToken($this->getAccessToken())
+            ->acceptJson()
+            ->timeout(30)
+            ->get(
+                $this->baseUrl() .
+                '/v1/billing/subscriptions/' .
+                urlencode($subscriptionId)
+            );
+
+        if ($response->failed()) {
+            throw new RuntimeException(
+                'Unable to fetch PayPal subscription. HTTP status: ' .
+                $response->status()
+            );
+        }
+
+        return $response->json();
+    }
+
 
     public function createProduct(): array
     {
