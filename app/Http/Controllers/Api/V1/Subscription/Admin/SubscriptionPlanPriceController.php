@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Subscription\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Subscription\SubscriptionPlanPriceAdminResource;
 use App\Models\SubscriptionPlan;
+use App\Services\Payment\PayPalService;
 use App\Services\Subscription\SubscriptionPlanPriceAdminService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,8 @@ use Illuminate\Validation\ValidationException;
 class SubscriptionPlanPriceController extends Controller
 {
     public function __construct(
-        protected SubscriptionPlanPriceAdminService $service
+        protected SubscriptionPlanPriceAdminService $service,
+        protected PayPalService $paypalService
     ) {
     }
 
