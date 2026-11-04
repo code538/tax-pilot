@@ -175,7 +175,9 @@ class SubscriptionPlanPriceController extends Controller
             ]);
         }
 
-       $data['interval_count'] = $data['interval_count'] ?? 1;
+       $data['interval_count'] = $data['payment_mode'] === 'recurring'
+            ? ($data['interval_count'] ?? 1)
+            : 1;
         $data['currency'] = strtoupper($data['currency'] ?? 'GBP');
         $data['is_active'] = $data['is_active'] ?? true;
 
