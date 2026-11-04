@@ -132,13 +132,13 @@ class SubscriptionPlanPriceController extends Controller
                 Rule::in(['one_time', 'recurring']),
             ],
 
-            'billing_interval' => [
-                'nullable',
-                Rule::requiredIf(
-                    fn () => $request->input('payment_mode') === 'recurring'
-                ),
-                Rule::in(['monthly', 'quarterly']),
-            ],
+            // 'billing_interval' => [
+            //     'nullable',
+            //     Rule::requiredIf(
+            //         fn () => $request->input('payment_mode') === 'recurring'
+            //     ),
+            //     Rule::in(['monthly', 'quarterly']),
+            // ],
 
             'interval_count' => [
                 'nullable',
