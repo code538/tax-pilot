@@ -126,7 +126,8 @@ class SubscriptionPlanPriceController extends Controller
 
         if(!$plan){
             return $this->response->error(
-                'Subscription plan not found.'
+                'Subscription plan not found.',
+                404
             );
         }
         
