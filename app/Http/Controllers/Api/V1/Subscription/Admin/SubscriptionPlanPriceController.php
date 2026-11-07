@@ -11,12 +11,14 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use App\Services\ApiResponseService;
 
 class SubscriptionPlanPriceController extends Controller
 {
     public function __construct(
         protected SubscriptionPlanPriceAdminService $service,
-        protected PayPalService $paypalService
+        protected PayPalService $paypalService,
+        protected ApiResponseService $response
     ) {
     }
 
@@ -119,9 +121,15 @@ class SubscriptionPlanPriceController extends Controller
 
     public function store(Request $request, int $planId): JsonResponse
     {
-        dd('ok');
-        $plan = SubscriptionPlan::query()->findOrFail($planId);
         //dd('ok');
+        $plan = SubscriptionPlan::query()->findOrFail($planId);
+
+        if(!$plan){
+            return $this->response->error(
+                'Subscription plan not found.'
+            );
+        }
+        
         $data = $request->validate([
             // 'billing_interval' => [
             //     'required',
