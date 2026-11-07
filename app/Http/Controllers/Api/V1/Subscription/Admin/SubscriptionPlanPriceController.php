@@ -120,7 +120,7 @@ class SubscriptionPlanPriceController extends Controller
     public function store(Request $request, int $planId): JsonResponse
     {
         $plan = SubscriptionPlan::query()->findOrFail($planId);
-
+        dd('ok');
         $data = $request->validate([
             // 'billing_interval' => [
             //     'required',
