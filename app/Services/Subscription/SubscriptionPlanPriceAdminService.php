@@ -61,6 +61,24 @@ class SubscriptionPlanPriceAdminService
         return $price->refresh();
     }
 
+    // private function normalizePaymentInterval(
+    //     array &$data,
+    //     ?SubscriptionPlanPrice $price = null
+    // ): void {
+    //     $paymentMode = $data['payment_mode'] ?? $price?->payment_mode;
+
+    //     if ($paymentMode === 'one_time') {
+    //         $data['billing_interval'] = null;
+    //         $data['interval_count'] = null;
+
+    //         return;
+    //     }
+
+    //     if ($paymentMode === 'recurring') {
+    //         $data['interval_count'] ??= $price?->interval_count ?? 1;
+    //     }
+    // }
+
     private function normalizePaymentInterval(
         array &$data,
         ?SubscriptionPlanPrice $price = null
@@ -69,7 +87,7 @@ class SubscriptionPlanPriceAdminService
 
         if ($paymentMode === 'one_time') {
             $data['billing_interval'] = null;
-            $data['interval_count'] = null;
+            $data['interval_count'] = 1;
 
             return;
         }
