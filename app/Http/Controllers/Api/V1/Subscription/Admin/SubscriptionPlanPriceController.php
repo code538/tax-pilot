@@ -122,7 +122,7 @@ class SubscriptionPlanPriceController extends Controller
     public function store(Request $request, int $planId): JsonResponse
     {
         //dd('ok');
-        $plan = SubscriptionPlan::query()->findOrFail($planId);
+        $plan = SubscriptionPlan::query()->find($planId);
 
         if(!$plan){
             return $this->response->error(
